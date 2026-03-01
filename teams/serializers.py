@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Team, MembershipApplication, Project, Achievement
+from .models import Team, MembershipApplication, Project, Achievement, Event, EventRegistration
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -30,3 +30,16 @@ class AchievementSerializer(serializers.ModelSerializer):
         model = Achievement
         fields = '__all__'
         read_only_fields = ('id', 'created_at')
+
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = "__all__"
+
+
+class EventRegistrationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventRegistration
+        fields = "__all__"
+

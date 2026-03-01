@@ -1,11 +1,14 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Team, MembershipApplication, Project, Achievement
+from .models import (Team, MembershipApplication,
+                    Project, Achievement, 
+                    Event, EventRegistration)
 from .serializers import (
     TeamSerializer,
     MembershipApplicationSerializer,
     ProjectSerializer,
-    AchievementSerializer
+    AchievementSerializer,
+    EventSerializer, EventRegistrationSerializer
 )
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -42,3 +45,13 @@ class AchievementViewSet(viewsets.ModelViewSet):
     queryset = Achievement.objects.all()
     serializer_class = AchievementSerializer
     permission_classes = [AllowAny]
+
+
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+
+
+class EventRegistrationViewSet(viewsets.ModelViewSet):
+    queryset = EventRegistration.objects.all()
+    serializer_class = EventRegistrationSerializer

@@ -117,3 +117,51 @@ class Achievement(models.Model):
         return self.title
 
 
+class Event(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    date = models.DateTimeField()
+    location = models.CharField(max_length=255)
+    media_url = models.URLField(blank=True, null=True)
+
+    created_by = models.UUIDField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "events"
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["created_by"]),
+        ]
+
+    def __str__(self):
+        return self.title
+
+
+class EventRegistration(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name="registrations"
+    )
+
+    full_name = models.CharField(max_length=150)
+    email = models.EmailField(max_length=255)
+    department = models.CharField(max_length=150)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "event_registrations"
+        indexes = [
+            models.Index(fields=["event"]),
+        ]
+
+    def __str__(self):
+        return f"{self.full_name} - {self.event.title}"
+
+
