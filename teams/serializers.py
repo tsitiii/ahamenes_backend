@@ -3,7 +3,7 @@ from .models import Team, MembershipApplication, Project, Achievement, Event, Ev
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    logo = serializers.ImageField(required=False)
+    logo = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Team

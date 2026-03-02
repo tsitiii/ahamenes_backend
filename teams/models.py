@@ -126,7 +126,7 @@ class Event(models.Model):
     location = models.CharField(max_length=255)
     media_url = models.URLField(blank=True, null=True)
 
-    created_by = models.UUIDField(null=True, blank=True)
+    created_by = models.UUIDField(null=True, blank=True) # will be changed later when there is user model
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

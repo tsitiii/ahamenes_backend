@@ -1,5 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 from .models import (Team, MembershipApplication,
                     Project, Achievement, 
                     Event, EventRegistration)
@@ -11,10 +13,28 @@ from .serializers import (
     EventSerializer, EventRegistrationSerializer
 )
 
+@extend_schema(
+    request={
+        'multipart/form-data': {
+            'type': 'object',
+            'properties': {
+                'logo': {
+                    'type': 'string',
+                    'format': 'binary'
+                },
+                'name': {'type': 'string'},
+                'slug': {'type': 'string'},
+                'description': {'type': 'string'},
+            }
+        },
+        'application/json': TeamSerializer
+    }
+)
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
     permission_classes = [AllowAny]
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
 class MembershipApplicationViewSet(viewsets.ModelViewSet):
     queryset = MembershipApplication.objects.all()
