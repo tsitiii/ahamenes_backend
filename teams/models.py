@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.conf import settings
 from cloudinary.models import CloudinaryField
 
 class Team(models.Model):
@@ -25,7 +26,7 @@ class MembershipApplication(models.Model):
 
     STATUS_CHOICES = (
         ('pending', 'Pending'),
-        ('approved', 'Approved'),
+        ('accepted', 'Accepted'),
         ('rejected', 'Rejected'),
     )
 
@@ -49,7 +50,7 @@ class MembershipApplication(models.Model):
 
     reviewed_at = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
-        'auth.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -78,7 +79,7 @@ class Project(models.Model):
     media_url = models.URLField(blank=True, null=True)
 
     created_by = models.ForeignKey(
-        'auth.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
