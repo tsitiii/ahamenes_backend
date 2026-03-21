@@ -8,9 +8,11 @@ class BlogPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogPost
         fields = "__all__"
+        read_only_fields = ('id', 'author', 'published_at', 'created_at', 'updated_at')
 
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = "__all__"
+        read_only_fields = ('id', 'post', 'user', 'created_at', 'updated_at')

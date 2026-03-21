@@ -14,10 +14,11 @@ router = DefaultRouter()
 router.register(r'teams', TeamViewSet, basename='teams')
 teams_router = routers.NestedDefaultRouter(router, r'teams', lookup='team')
 teams_router.register(r'projects', ProjectViewSet, basename='team-projects')
+teams_router.register(r'achievements', AchievementViewSet, basename='team-achievements')
 
 router.register(r'membership/applications', MembershipApplicationViewSet)
 
-router.register(r'achievements', AchievementViewSet)
+# router.register(r'achievements', AchievementViewSet)
 
 router.register(r'events', EventViewSet, basename='events')
 events_router = routers.NestedDefaultRouter(router, r'events', lookup='event')

@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 from .models import BlogPost, Comment
@@ -29,15 +29,20 @@ from .serializers import BlogPostSerializer, CommentSerializer
 class BlogPostViewSet(viewsets.ModelViewSet):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
+    permission_classes = [permissions.IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         return Comment.objects.filter(post_id=self.kwargs['post_pk'])
 
     def perform_create(self, serializer):
-        serializer.save(post_id=self.kwargs['post_pk'])
+        serializer.save(post_id=self.kwargs['post_pk'], user=self.request.user)
 

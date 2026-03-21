@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.conf import settings
 from cloudinary.models import CloudinaryField
 
 
@@ -12,7 +13,13 @@ class BlogPost(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    author_id = models.UUIDField(null=True, blank=True) # will be replaced with actual user from accounts
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='blog_posts',
+        null=True,
+        blank=True
+    )
 
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
@@ -28,7 +35,7 @@ class BlogPost(models.Model):
         default="draft"
     )
 
-    published_at = models.DateTimeField(null=True, blank=True)
+    published_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -44,7 +51,7 @@ class BlogPost(models.Model):
         ]
     
     def __str__(self):
-        return f"{self.title} by {self.author_id}"
+        return f"{self.title} by {self.author}"
 
 
 class Comment(models.Model):
@@ -57,7 +64,13 @@ class Comment(models.Model):
         related_name="comments"
     )
 
-    user_id = models.UUIDField(null=True, blank=True) # will be replaced by actual user from accounts
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        null=True,
+        blank=True
+    )
 
     content = models.TextField()
 

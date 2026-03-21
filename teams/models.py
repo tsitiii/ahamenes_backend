@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.conf import settings
 from cloudinary.models import CloudinaryField
 
 class Team(models.Model):
@@ -49,7 +50,7 @@ class MembershipApplication(models.Model):
 
     reviewed_at = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
-        'auth.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -78,7 +79,7 @@ class Project(models.Model):
     media_url = models.URLField(blank=True, null=True)
 
     created_by = models.ForeignKey(
-        'auth.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -105,7 +106,12 @@ class Achievement(models.Model):
 
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
     date = models.DateField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -126,7 +132,12 @@ class Event(models.Model):
     location = models.CharField(max_length=255)
     media_url = models.URLField(blank=True, null=True)
 
-    created_by = models.UUIDField(null=True, blank=True) # will be changed later when there is user model
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
