@@ -68,6 +68,14 @@ ALLOWED_HOSTS=*
 cloud_name=your_cloud_name
 api_key=your_api_key
 api_secret=your_api_secret
+
+# Email + Membership Approval
+# Use SMTP backend in production; console backend prints emails in terminal for local dev
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+DEFAULT_FROM_EMAIL=no-reply@yourdomain.com
+
+# Frontend route that will receive uid/token from acceptance email
+FRONTEND_SET_PASSWORD_URL=http://localhost:3000/set-password
 ```
 
 ### 5. Run Migrations
