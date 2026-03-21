@@ -15,7 +15,7 @@ from .serializers import (
     AchievementSerializer,
     EventSerializer, EventRegistrationSerializer
 )
-from accounts.permissions import IsTeamAdmin, IsSuperAdmin
+from accounts.permissions import IsTeamAdmin, IsSuperAdmin, IsTeamManager
 
 @extend_schema(
     request={
@@ -37,8 +37,35 @@ from accounts.permissions import IsTeamAdmin, IsSuperAdmin
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
-    permission_classes = [IsSuperAdmin]
+    permission_classes = [AllowAny]
     parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+    def get_permissions(self):
+        if self.action in ['create', 'destroy']:
+            return [IsSuperAdmin()]
+        if self.action in ['update', 'partial_update', 'dashboard']:
+            return [IsTeamManager()]
+        return [AllowAny()]
+
+    @action(detail=True, methods=['get'])
+    def dashboard(self, request, pk=None):
+        team = self.get_object()
+        
+        # Aggregate data
+        stats = {
+            "total_members": team.members.count(),
+            "total_projects": team.projects.count(),
+            "total_achievements": team.achievements.count(),
+            "members": team.members.values('id', 'full_name', 'email', 'role'),
+            "recent_projects": team.projects.values('id', 'title', 'created_at')[:5],
+            "recent_achievements": team.achievements.values('id', 'title', 'date')[:5]
+        }
+        
+        return Response({
+            "success": True,
+            "data": stats,
+            "message": f"Dashboard data for {team.name}"
+        })
 
 class MembershipApplicationViewSet(viewsets.ModelViewSet):
     queryset = MembershipApplication.objects.all()
