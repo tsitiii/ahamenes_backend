@@ -136,7 +136,27 @@ class AchievementViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsTeamAdmin()]
+
+    def get_queryset(self):
+        queryset = Event.objects.all()
+        # Archive logic (FR-24)
+        archive = self.request.query_params.get('archive')
+        now = timezone.now()
+        
+        if archive == 'true':
+            queryset = queryset.filter(date__lt=now)
+        elif archive == 'false':
+            queryset = queryset.filter(date__gte=now)
+        # Default behavior: show upcoming events unless archive is specified
+        elif not archive:
+            queryset = queryset.filter(date__gte=now)
+            
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -145,7 +165,11 @@ class EventViewSet(viewsets.ModelViewSet):
 class EventRegistrationViewSet(viewsets.ModelViewSet):
     queryset = EventRegistration.objects.all()
     serializer_class = EventRegistrationSerializer
-    permission_classes = [AllowAny]
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsTeamAdmin()]
 
     def get_queryset(self):
         queryset = EventRegistration.objects.all()
