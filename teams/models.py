@@ -142,6 +142,7 @@ class Event(models.Model):
 
     class Meta:
         db_table = "events"
+        ordering = ['-date']
         indexes = [
             models.Index(fields=["date"]),
             models.Index(fields=["created_by"]),
@@ -168,6 +169,7 @@ class EventRegistration(models.Model):
 
     class Meta:
         db_table = "event_registrations"
+        ordering = ['-created_at']
         indexes = [
             models.Index(fields=["event"]),
         ]

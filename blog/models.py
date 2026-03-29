@@ -80,6 +80,7 @@ class Comment(models.Model):
 
     class Meta:
         db_table = "comments"
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["post"]),
         ]

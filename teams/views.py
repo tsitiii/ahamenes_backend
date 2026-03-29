@@ -61,11 +61,7 @@ class TeamViewSet(viewsets.ModelViewSet):
             "recent_achievements": team.achievements.values('id', 'title', 'date')[:5]
         }
         
-        return Response({
-            "success": True,
-            "data": stats,
-            "message": f"Dashboard data for {team.name}"
-        })
+        return Response(stats,status=status.HTTP_200_OK)
 
 class MembershipApplicationViewSet(viewsets.ModelViewSet):
     queryset = MembershipApplication.objects.all()
@@ -81,24 +77,14 @@ class MembershipApplicationViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             self.perform_create(serializer)
-            return Response({
-                "success": True,
-                "data": serializer.data,
-                "message": "Application submitted successfully"
-            }, status=status.HTTP_201_CREATED)
-        return Response({
-            "success": False,
-            "error": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
         status_value = request.data.get('status')
         if status_value not in ['approved', 'rejected']:
-            return Response({
-                "success": False,
-                "error": "Invalid status. Use 'approved' or 'rejected'."
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid status. Use 'approved' or 'rejected'."}, status=status.HTTP_400_BAD_REQUEST)
 
         application = self.get_object()
         application.status = status_value
@@ -106,11 +92,7 @@ class MembershipApplicationViewSet(viewsets.ModelViewSet):
         application.reviewed_at = timezone.now()
         application.save()
         
-        return Response({
-            "success": True,
-            "data": self.get_serializer(application).data,
-            "message": f"Application {status_value} successfully"
-        })
+        return Response(self.get_serializer(application).data, status=status.HTTP_200_OK)
 
 class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer

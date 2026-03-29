@@ -61,6 +61,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     class Meta:
+        ordering = ['-created_at']
         indexes = [
             models.Index(fields=['team']),
             models.Index(fields=['role']),
