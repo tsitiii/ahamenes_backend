@@ -4,6 +4,7 @@ from .models import BlogPost, Comment
 
 class BlogPostSerializer(serializers.ModelSerializer):
     featured_image = serializers.ImageField(required=False)
+    author_name = serializers.ReadOnlyField(source='author.full_name')
 
     class Meta:
         model = BlogPost
