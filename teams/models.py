@@ -65,6 +65,13 @@ class MembershipApplication(models.Model):
         return f"{self.full_name} - {self.status}"
 
 class Project(models.Model):
+
+    STATUS_CHOICES = (
+        ('ongoing', 'Ongoing'),
+        ('completed', 'Completed'),
+        ('on_hold', 'On Hold'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     team = models.ForeignKey(
@@ -74,7 +81,14 @@ class Project(models.Model):
     )
 
     title = models.CharField(max_length=200)
+    summary = models.CharField(max_length=300, blank=True, default='')
     description = models.TextField()
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='ongoing'
+    )
 
     media_url = models.URLField(blank=True, null=True)
 

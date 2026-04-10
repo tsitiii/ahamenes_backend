@@ -167,6 +167,10 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API documentation for Ahamenes Backend',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'ENUM_NAME_OVERRIDES': {
+        'MembershipStatusEnum': 'teams.models.MembershipApplication.STATUS_CHOICES',
+        'ProjectStatusEnum': 'teams.models.Project.STATUS_CHOICES',
+    },
 }
 
 

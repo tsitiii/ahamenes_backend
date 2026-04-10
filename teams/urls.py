@@ -1,12 +1,15 @@
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
 from .views import (
     TeamViewSet,
     MembershipApplicationViewSet,
     ProjectViewSet,
+    TopLevelProjectViewSet,
     AchievementViewSet,
     EventViewSet,
-    EventRegistrationViewSet
+    EventRegistrationViewSet,
+    AboutStatsView,
 )
 
 router = DefaultRouter()
@@ -18,10 +21,15 @@ teams_router.register(r'achievements', AchievementViewSet, basename='team-achiev
 
 router.register(r'membership/applications', MembershipApplicationViewSet)
 
-# router.register(r'achievements', AchievementViewSet)
+# Top-level projects (read-only: list, retrieve, featured)
+router.register(r'projects', TopLevelProjectViewSet, basename='projects')
 
 router.register(r'events', EventViewSet, basename='events')
 events_router = routers.NestedDefaultRouter(router, r'events', lookup='event')
 events_router.register(r'registrations', EventRegistrationViewSet, basename='event-registrations')
 
-urlpatterns = router.urls + teams_router.urls + events_router.urls
+extra_urlpatterns = [
+    path('about/stats/', AboutStatsView.as_view(), name='about-stats'),
+]
+
+urlpatterns = router.urls + teams_router.urls + events_router.urls + extra_urlpatterns

@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
+from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse, OpenApiExample
+from drf_spectacular.openapi import AutoSchema
 from .models import (Team, MembershipApplication,
                     Project, Achievement, 
                     Event, EventRegistration)
@@ -12,9 +14,12 @@ from .serializers import (
     TeamSerializer,
     MembershipApplicationSerializer,
     ProjectSerializer,
+    ProjectListSerializer,
+    FeaturedProjectSerializer,
     AchievementSerializer,
     EventSerializer, EventRegistrationSerializer
 )
+from accounts.models import CustomUser
 from accounts.permissions import IsTeamAdmin, IsSuperAdmin, IsTeamManager
 
 @extend_schema(
@@ -94,7 +99,9 @@ class MembershipApplicationViewSet(viewsets.ModelViewSet):
         
         return Response(self.get_serializer(application).data, status=status.HTTP_200_OK)
 
+# --- Nested under /teams/{team_pk}/projects/ ---
 class ProjectViewSet(viewsets.ModelViewSet):
+    """Handles create/update/delete — nested under a specific team."""
     serializer_class = ProjectSerializer
 
     def get_permissions(self):
@@ -103,12 +110,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
     def get_queryset(self):
-        queryset = Project.objects.all()
+        queryset = Project.objects.select_related('team').all()
         team_id = self.kwargs.get('team_pk')
-
         if team_id:
             queryset = queryset.filter(team_id=team_id)
-
         return queryset
 
     def perform_create(self, serializer):
@@ -117,6 +122,95 @@ class ProjectViewSet(viewsets.ModelViewSet):
             serializer.save(team_id=team_id, created_by=self.request.user)
         else:
             serializer.save(created_by=self.request.user)
+
+
+# --- Top-level /projects/ (read-only, public) ---
+class TopLevelProjectViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    GET /api/v1/club_management/projects/          — paginated list of all projects
+    GET /api/v1/club_management/projects/{id}/     — project detail
+    GET /api/v1/club_management/projects/featured/ — featured projects (lightweight)
+    """
+    permission_classes = [AllowAny]
+    serializer_class = ProjectListSerializer
+
+    def get_queryset(self):
+        return Project.objects.select_related('team', 'created_by').all()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('limit', OpenApiTypes.INT, description='Max number of featured projects to return (default 6)')
+        ]
+    )
+    @action(detail=False, methods=['get'], url_path='featured')
+    def featured(self, request):
+        """Returns a lightweight list of featured (most recent) projects."""
+        limit = int(request.query_params.get('limit', 6))
+        qs = self.get_queryset()[:limit]
+        serializer = FeaturedProjectSerializer(qs, many=True)
+        return Response({'results': serializer.data}, status=status.HTTP_200_OK)
+
+
+# --- About stats ---
+class AboutStatsView(APIView):
+    """
+    GET /api/v1/club_management/about/stats/
+    Returns key club-wide statistics for the About page.
+    """
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        summary='Get About Page Stats',
+        description='Returns a list of key club-wide statistics (members, teams, projects, events, achievements).',
+        responses={
+            200: OpenApiResponse(
+                description='Club statistics',
+                examples=[
+                    OpenApiExample(
+                        'Example Stats',
+                        value={
+                            'stats': [
+                                {'key': 'total_members', 'value': '42', 'label': 'Active Members'},
+                                {'key': 'total_teams',   'value': '5',  'label': 'Teams'},
+                                {'key': 'total_projects','value': '18', 'label': 'Projects Built'},
+                                {'key': 'total_events',  'value': '10', 'label': 'Events Hosted'},
+                                {'key': 'total_achievements', 'value': '7', 'label': 'Achievements'},
+                            ]
+                        }
+                    )
+                ]
+            )
+        }
+    )
+    def get(self, request):
+        stats = [
+            {
+                'key': 'total_members',
+                'value': str(CustomUser.objects.filter(is_active=True).count()),
+                'label': 'Active Members',
+            },
+            {
+                'key': 'total_teams',
+                'value': str(Team.objects.count()),
+                'label': 'Teams',
+            },
+            {
+                'key': 'total_projects',
+                'value': str(Project.objects.count()),
+                'label': 'Projects Built',
+            },
+            {
+                'key': 'total_events',
+                'value': str(Event.objects.count()),
+                'label': 'Events Hosted',
+            },
+            {
+                'key': 'total_achievements',
+                'value': str(Achievement.objects.count()),
+                'label': 'Achievements',
+            },
+        ]
+        return Response({'stats': stats}, status=status.HTTP_200_OK)
 
 class AchievementViewSet(viewsets.ModelViewSet):
     serializer_class = AchievementSerializer

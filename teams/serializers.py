@@ -18,11 +18,35 @@ class MembershipApplicationSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'status', 'reviewed_at', 'reviewed_by', 'created_at')
 
 class ProjectSerializer(serializers.ModelSerializer):
+    """Used for create/update under nested /teams/{id}/projects/"""
 
     class Meta:
         model = Project
         fields = '__all__'
-        read_only_fields = ('id', 'created_by','team', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'created_by', 'team', 'created_at', 'updated_at')
+
+
+class ProjectListSerializer(serializers.ModelSerializer):
+    """Used for the top-level GET /projects/ and GET /projects/{id}/"""
+    team_name = serializers.CharField(source='team.name', read_only=True)
+
+    class Meta:
+        model = Project
+        fields = (
+            'id', 'title', 'description', 'summary', 'status',
+            'media_url', 'team', 'team_name', 'created_by',
+            'created_at', 'updated_at',
+        )
+        read_only_fields = fields
+
+
+class FeaturedProjectSerializer(serializers.ModelSerializer):
+    """Minimal shape for GET /projects/featured/"""
+    team_name = serializers.CharField(source='team.name', read_only=True)
+
+    class Meta:
+        model = Project
+        fields = ('id', 'title', 'summary', 'team_name', 'media_url')
 
 class AchievementSerializer(serializers.ModelSerializer):
 
