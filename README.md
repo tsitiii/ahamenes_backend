@@ -98,7 +98,7 @@ Once the server is running, you can access the interactive API documentation:
 - **ReDoc**: [http://127.0.0.1:8000/api/schema/redoc/](http://127.0.0.1:8000/api/schema/redoc/)
 - **Raw Schema**: [http://127.0.0.1:8000/api/schema/](http://127.0.0.1:8000/api/schema/)
 
-## 🚀 Deployment (Render)
+##  Deployment (Render)
 
 This project is configured for deployment on [Render](https://render.com/).
 
