@@ -2,7 +2,7 @@
 
 This is the backend API for the GDG Ahamenes project, built with Django and Django Rest Framework (DRF). It provides endpoints for managing user accounts, teams, projects, events, and blog posts.
 
-## 🚀 Features
+##  Features
 
 - **Authentication**: Secure user authentication using JSON Web Tokens (JWT).
 - **Team Management**: Create and manage teams, including membership applications.
