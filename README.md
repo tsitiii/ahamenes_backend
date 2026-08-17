@@ -22,7 +22,7 @@ This is the backend API for the GDG Ahamenes project, built with Django and Djan
 - **Server**: Gunicorn
 - **Static Files**: Whitenoise
 
-## 💻 Local Development Setup
+##  Local Development Setup
 
 Follow these steps to set up the project locally.
 
