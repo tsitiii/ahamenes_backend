@@ -12,7 +12,7 @@ This is the backend API for the GDG Ahamenes project, built with Django and Djan
 - **API Documentation**: Auto-generated interactive API documentation using **Swagger UI** and **ReDoc** (via **drf-spectacular**).
 - **Deployment Ready**: Configured for deployment on **Render** (using **Gunicorn**, **Whitenoise**, and **build.sh**).
 
-##  Tech Stack..
+##  Tech Stack
 
 - **Framework**: Django 5.2, Django Rest Framework 3.16
 - **Database**: PostgreSQL (Production), SQLite (Development)
